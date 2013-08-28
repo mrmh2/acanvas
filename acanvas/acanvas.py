@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.misc
 
+from fonty import Glyph, Font, Bitmap
 from coords2d import Coords2D
 
 class Canvas(object):
@@ -11,7 +12,7 @@ class Canvas(object):
         self.array = np.zeros((x_size, y_size, 3), dtype=np.uint8)
 
     def save_as_png(self, filename):
-        scipy.misc.imsave(filename, self.array)
+        scipy.misc.imsave(filename, np.transpose(self.array))
 
     def __setitem__(self, key, value):
         self.array[key] = value
@@ -21,3 +22,23 @@ class Canvas(object):
         for x in range(p1.x, p2.x + 1):
             for y in range(p1.y, p2.y + 1):
                 self.array[x, y] = col
+
+    def draw_char(self, p, char, font="FreeMono.ttf", fsize=24):
+
+        x_offset = p.x
+        y_offset = p.y
+
+        fnt = Font(font, fsize)
+        ch = fnt.render_character(char)
+        for y in range(ch.height):
+            for x in range(ch.width):
+                if ch.pixels[y * ch.width + x]:
+                    self.array[x_offset + x, y_offset + y] = (255, 255, 255)
+
+    def draw_text(self, p, text, font="FreeMono.ttf", fsize=24):
+
+        for char in text:
+            self.draw_char(p, char, font, fsize)
+            p += Coords2D(10, 0)
+
+
