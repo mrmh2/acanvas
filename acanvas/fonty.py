@@ -17,10 +17,59 @@ class Font(object):
         glyph = self.glyph_for_character(char)
         return glyph.bitmap
 
+    def text_dimensions(self, text):
+        """Return (width, height, baseline) of text rendered in current font"""
+
+        width = 0
+        max_ascent = 0
+        max_descent = 0
+        previous_char = None
+
+        for char in text:
+            glyph = self.glyph_for_character(char)
+            max_ascent = max(max_ascent, glyph.ascent)
+            max_descent = max(max_descent, glyph.descent)
+            width += glyph.advance_width
+            previous_char = char
+
+        height = max_ascent + max_descent
+
+        return width, height, max_descent
+
+    def render_text(self, text, width=None, height=None, baseline=None):
+        """Render text into a Bitmap and return it"""
+
+        if None in (width, height, baseline):
+            width, height, baseline = self.text_dimensions(text)
+
+        x = 0
+        previous_char = None
+        outbuffer = Bitmap(width, height)
+
+        for char in text:
+            glyph = self.glyph_for_character(char)
+            y = heigh
+
 class Glyph(object):
 
-    def __init__(self, pixels, width, height):
+    def __init__(self, pixels, width, height, top, advance_width):
         self.bitmap = Bitmap(width, height, pixels)
+
+        self.top = top
+
+        self.descent = max(0, self.height - self.top)
+        self.ascent = max(0, max(self.top, self.height) - self.descent)
+
+        # Horizontal distance to place next character
+        self.advance_width = advance_width
+
+    @property
+    def width(self):
+        return self.bitmap.width
+
+    @property
+    def height(self):
+        return self.bitmap.height
 
     @staticmethod
     def from_glyphslot(slot):
