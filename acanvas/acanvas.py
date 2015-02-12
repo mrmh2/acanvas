@@ -1,3 +1,5 @@
+import os.path as _osp
+
 import numpy as np
 import scipy.misc
 
@@ -23,19 +25,23 @@ class Canvas(object):
             for y in range(p1.y, p2.y + 1):
                 self.array[x, y] = col
 
-    def draw_char(self, p, char, font="FreeMono.ttf", fsize=24):
+    def draw_char(self, p, char, font="fonts/FreeMono.ttf", fsize=24):
+
+        pkg_dir, name = _osp.split(_osp.abspath(__file__))
+
+        font_path = _osp.join(pkg_dir, font)
 
         x_offset = p.x
         y_offset = p.y
 
-        fnt = Font(font, fsize)
+        fnt = Font(font_path, fsize)
         ch = fnt.render_character(char)
         for y in range(ch.height):
             for x in range(ch.width):
                 if ch.pixels[y * ch.width + x]:
                     self.array[x_offset + x, y_offset + y] = (255, 255, 255)
 
-    def draw_text(self, p, text, font="FreeMono.ttf", fsize=24):
+    def draw_text(self, p, text, font="fonts/FreeMono.ttf", fsize=24):
 
         for char in text:
             self.draw_char(p, char, font, fsize)

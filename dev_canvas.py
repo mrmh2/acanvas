@@ -1,5 +1,5 @@
 from acanvas.acanvas import Canvas
-from coords2d import Coords2D
+from acanvas.coords2d import Coords2D
 from acanvas.fonty import Font
 
 def main():
@@ -9,7 +9,7 @@ def main():
     p2 = Coords2D(110, 110)
     c.rect(p1, p2)
 
-    c.draw_text( Coords2D(200, 200), 'foobar' )
+    c.draw_text( Coords2D(200, 200), 'Here is some text!' , font='fonts/UbuntuMono-R.ttf')
 
     c.save_as_png("test.png")
 

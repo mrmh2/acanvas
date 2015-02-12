@@ -1,3 +1,4 @@
+import sys
 import freetype
 
 class Font(object):
@@ -5,7 +6,12 @@ class Font(object):
     http://dbader.org/blog/monochrome-font-rendering-with-freetype-and-python"""
 
     def __init__(self, filename, size):
-        self.face = freetype.Face(filename)
+        try:
+            self.face = freetype.Face(filename)
+        except freetype.ft_errors.FT_Exception:
+            print "Failed to load font: {}".format(filename)
+            sys.exit(2)
+
         self.face.set_pixel_sizes(0, size)
 
     def glyph_for_character(self, char):
@@ -75,7 +81,7 @@ class Glyph(object):
     def from_glyphslot(slot):
         pixels = Glyph.unpack_mono_bitmap(slot.bitmap)
         width, height = slot.bitmap.width, slot.bitmap.rows
-        return Glyph(pixels, width, height)
+        return Glyph(pixels, width, height, 0, 0)
 
     @staticmethod
     def unpack_mono_bitmap(bitmap):
