@@ -54,7 +54,12 @@ class Font(object):
 
         for char in text:
             glyph = self.glyph_for_character(char)
-            y = heigh
+            y = height - glyph.ascent - baseline
+            outbuffer.bitblt(glyph.bitmap, x, y)
+            x += glyph.advance_width
+            previous_char = char
+
+        return outbuffer
 
 class Glyph(object):
 
@@ -78,10 +83,13 @@ class Glyph(object):
         return self.bitmap.height
 
     @staticmethod
-    def from_glyphslot(slot):
+    def from_glyphslot(slot):        
         pixels = Glyph.unpack_mono_bitmap(slot.bitmap)
         width, height = slot.bitmap.width, slot.bitmap.rows
-        return Glyph(pixels, width, height, 0, 0)
+        top = slot.bitmap_top
+
+        advance_width = slot.advance.x / 64
+        return Glyph(pixels, width, height, top, advance_width)
 
     @staticmethod
     def unpack_mono_bitmap(bitmap):
@@ -131,3 +139,16 @@ class Bitmap(object):
             rows += '\n'
 
         return rows
+
+    def bitblt(self, src, x, y):
+        srcpixel = 0
+        dstpixel = y * self.width+ x
+        row_offset = self.width - src.width
+
+        for sy in range(src.height):
+            for sx in range(src.width):
+                self.pixels[dstpixel] = src.pixels[srcpixel]
+                srcpixel += 1
+                dstpixel += 1
+            dstpixel += row_offset
+
